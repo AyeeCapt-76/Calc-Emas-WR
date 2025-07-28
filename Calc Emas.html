@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalkulator Emas</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .calc-wrapper {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 340px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .highlight {
+      font-weight: bold;
+      font-size: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .total-box {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .marketplace-box {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .kadar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .kadar-grid button {
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #e0e0e0;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .kadar-grid button.active {
+      background: #007bff;
+      color: #fff;
+    }
+
+    .harga-kadar-edit {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: space-between;
+    }
+
+    .harga-kadar-edit div {
+      width: 48%;
+    }
+
+    .harga-kadar-edit input {
+      width: 100%;
+    }
+
+    .btn-hitung {
+      background: #28a745;
+      color: white;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .btn-hitung:hover {
+      background: #218838;
+    }
+
+    .section-title {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 14px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calc-wrapper">
+    <h2>Kalkulator Emas</h2>
+
+    <!-- Hasil muncul di atas -->
+    <div id="hasilHarga" class="highlight total-box">Total Harga: -</div>
+    <div id="hargaMarketplace" class="highlight marketplace-box">Harga Marketplace: -</div>
+
+    <label for="jenisHarga">Jenis Harga</label>
+    <select id="jenisHarga" onchange="updateHargaKadar()">
+      <option value="pameran">Harga Pameran</option>
+      <option value="non">Harga Non-Pameran</option>
+    </select>
+
+    <label>Gramasi (gram)</label>
+    <input type="number" id="gramasi" placeholder="Contoh: 3.5">
+
+    <label>Pilih Kadar</label>
+    <div class="kadar-grid" id="kadarButtons">
+      <button onclick="selectKadar('6K')">6K</button>
+      <button onclick="selectKadar('8K')">8K</button>
+      <button onclick="selectKadar('9K')">9K</button>
+      <button onclick="selectKadar('16K')">16K</button>
+      <button onclick="selectKadar('17K')">17K</button>
+      <button onclick="selectKadar('8Kp')">8Kp</button>
+      <button onclick="selectKadar('9Kp')">9Kp</button>
+      <button onclick="selectKadar('24K')">24K</button>
+    </div>
+
+    <button class="btn-hitung" onclick="hitungHarga()">Hitung</button>
+
+    <!-- Bagian edit harga di bawah -->
+    <div class="section-title">Edit Harga per Kadar (Rp)</div>
+    <div class="harga-kadar-edit">
+      <div><input id="harga6K" placeholder="6K"></div>
+      <div><input id="harga8K" placeholder="8K"></div>
+      <div><input id="harga9K" placeholder="9K"></div>
+      <div><input id="harga16K" placeholder="16K"></div>
+      <div><input id="harga17K" placeholder="17K"></div>
+      <div><input id="harga8Kp" placeholder="8Kp"></div>
+      <div><input id="harga9Kp" placeholder="9Kp"></div>
+      <div><input id="harga24K" placeholder="24K"></div>
+    </div>
+  </div>
+
+  <script>
+    let kadarTerpilih = null;
+
+    const hargaPameran = {
+      "6K": 740000, "8K": 830000, "9K": 880000, "16K": 1405000,
+      "17K": 1555000, "8Kp": 840000, "9Kp": 880000, "24K": 0
+    };
+
+    const hargaNonPameran = {
+      "6K": 720000, "8K": 810000, "9K": 850000, "16K": 1365000,
+      "17K": 1505000, "8Kp": 820000, "9Kp": 860000, "24K": 2100000
+    };
+
+    function updateHargaKadar() {
+      const jenis = document.getElementById("jenisHarga").value;
+      const hargaData = jenis === "pameran" ? hargaPameran : hargaNonPameran;
+
+      for (const kadar in hargaData) {
+        const input = document.getElementById("harga" + kadar);
+        if (input) input.value = hargaData[kadar];
+      }
+    }
+
+    function selectKadar(kadar) {
+      kadarTerpilih = kadar;
+      const buttons = document.querySelectorAll('.kadar-grid button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function hitungHarga() {
+      const gramasi = parseFloat(document.getElementById("gramasi").value);
+      if (!kadarTerpilih) return alert("Pilih kadar terlebih dahulu!");
+      if (isNaN(gramasi) || gramasi <= 0) return alert("Masukkan gramasi valid!");
+
+      const hargaPerGram = parseFloat(document.getElementById("harga" + kadarTerpilih).value);
+      const total = gramasi * hargaPerGram;
+      const marketplaceRaw = total / 0.935;
+      const marketplaceRounded = Math.ceil(marketplaceRaw / 1000) * 1000;
+
+      document.getElementById("hasilHarga").innerText = 
+        `Total Harga: Rp ${total.toLocaleString('id-ID')}`;
+      document.getElementById("hargaMarketplace").innerText = 
+        `Harga Marketplace: Rp ${marketplaceRounded.toLocaleString('id-ID')}`;
+    }
+
+    updateHargaKadar();
+  </script>
+
+</body>
+</html>
