@@ -896,6 +896,121 @@
       animation: tapDot 0.4s ease both;
     }
     @keyframes tapDot { 0%{transform:scale(0);opacity:0} 50%{transform:scale(1.3);opacity:1} 100%{transform:scale(1);opacity:0.7} }
+
+    /* ════════════════════════════
+       KR PAGE
+    ════════════════════════════ */
+    #page-kr .pg-inner { max-width: 560px; margin: 0 auto; padding: 28px 20px 60px; }
+    .kr-header { margin-bottom: 24px; }
+    .kr-header-title { font-size: 1.15rem; font-weight: 800; color: var(--text); letter-spacing: -0.01em; margin-bottom: 5px; }
+    .kr-header-sub { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+    .kr-input-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 22px 20px 18px; margin-bottom: 14px;
+    }
+    .kr-input-main { position: relative; margin-bottom: 8px; }
+    .kr-currency-prefix {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; font-weight: 700; color: var(--text-muted); pointer-events: none; z-index: 1;
+    }
+    .kr-input {
+      width: 100%; background: var(--surface-2); border: 2px solid var(--border-mid);
+      border-radius: var(--r-lg); color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.7rem; font-weight: 800; padding: 14px 18px 14px 52px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      letter-spacing: -0.02em; box-sizing: border-box;
+    }
+    .kr-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(244,114,182,0.12); }
+    .kr-input::placeholder { color: var(--text-dim); font-weight: 400; font-size: 1.2rem; }
+    .kr-input::-webkit-outer-spin-button, .kr-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .kr-input[type=number] { -moz-appearance: textfield; }
+    .kr-input-hint { font-size: 0.73rem; color: var(--text-muted); margin-bottom: 14px; }
+    .kr-tier-indicator { display: flex; gap: 8px; flex-wrap: wrap; }
+    .kr-tier-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 13px; border-radius: 100px; font-size: 0.72rem; font-weight: 600;
+      border: 1.5px solid var(--border); color: var(--text-muted);
+      background: var(--surface-2); transition: all 0.18s; user-select: none;
+    }
+    .kr-tier-pill.active {
+      background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(244,114,182,0.08));
+      border-color: var(--gold); color: var(--text); box-shadow: 0 0 12px rgba(244,114,182,0.2);
+    }
+    .ktp-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; transition: background 0.18s; }
+    .kr-tier-pill.active .ktp-dot { background: var(--gold); }
+    .kr-result-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); overflow: hidden; margin-bottom: 14px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .kr-result-card.lit { border-color: var(--border-mid); box-shadow: 0 0 0 1px var(--border-mid), 0 8px 32px rgba(244,114,182,0.12); }
+    .kr-result-card::before {
+      content: ''; display: block; height: 2px;
+      background: linear-gradient(90deg, transparent, #EC4899, #A855F7, transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .kr-result-card.lit::before { opacity: 1; }
+    .kr-result-header {
+      padding: 13px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .kr-result-header-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
+    .kr-result-main { padding: 20px 18px 18px; }
+    .kr-kadar-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(168,85,247,0.12));
+      border: 1.5px solid rgba(244,114,182,0.4); border-radius: 12px; padding: 5px 14px;
+      font-size: 0.8rem; font-weight: 800; color: #fff; letter-spacing: 0.06em;
+      margin-bottom: 16px; text-transform: uppercase;
+    }
+    .kr-gram-display { font-size: 3rem; font-weight: 900; color: var(--text); line-height: 1; letter-spacing: -0.04em; margin-bottom: 4px; }
+    .kr-gram-unit { font-size: 1.1rem; font-weight: 500; color: var(--text-muted); margin-left: 5px; letter-spacing: 0; }
+    .kr-gram-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 18px; }
+    .kr-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kr-detail-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 11px 13px; }
+    .kr-detail-box-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 5px; }
+    .kr-detail-box-val { font-size: 0.93rem; font-weight: 800; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .kr-detail-box-sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .kr-history-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); overflow: hidden; }
+    .kr-history-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .kr-history-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
+    .kr-history-clear { font-size: 0.72rem; color: rgba(248,113,113,0.7); cursor: pointer; font-weight: 600; background: none; border: none; padding: 2px 6px; font-family: 'Inter', sans-serif; transition: color 0.15s; }
+    .kr-history-clear:hover { color: #F87171; }
+    .kr-history-list { max-height: 260px; overflow-y: auto; }
+    .kr-history-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    .kr-history-row:last-child { border-bottom: none; }
+    .kr-history-row:hover { background: rgba(244,114,182,0.04); }
+    .kr-history-modal { font-size: 0.88rem; color: var(--text); font-weight: 700; }
+    .kr-history-sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .kr-history-gram { font-weight: 800; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem; text-align: right; }
+    .kr-history-kadar { display: inline-block; background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.25); border-radius: 5px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; color: #F472B6; }
+    .kr-empty { padding: 28px; text-align: center; font-size: 0.8rem; color: var(--text-muted); }
+    /* KR light mode */
+    html.light .kr-header-title { color: #4A0728; }
+    html.light .kr-header-sub { color: rgba(74,7,40,0.5); }
+    html.light .kr-input-card { background: #fff; border-color: rgba(236,72,153,0.12); }
+    html.light .kr-currency-prefix { color: rgba(74,7,40,0.45); }
+    html.light .kr-input { background: #FDF2F8; border-color: rgba(236,72,153,0.3); color: #4A0728; }
+    html.light .kr-input:focus { border-color: #EC4899; box-shadow: 0 0 0 4px rgba(236,72,153,0.1); }
+    html.light .kr-input-hint { color: rgba(74,7,40,0.45); }
+    html.light .kr-tier-pill { color: rgba(74,7,40,0.5); border-color: rgba(236,72,153,0.18); background: rgba(255,255,255,0.8); }
+    html.light .kr-tier-pill.active { color: #4A0728; border-color: #EC4899; background: rgba(236,72,153,0.1); }
+    html.light .ktp-dot { background: rgba(74,7,40,0.2); }
+    html.light .kr-tier-pill.active .ktp-dot { background: #EC4899; }
+    html.light .kr-result-card { background: #fff; border-color: rgba(236,72,153,0.12); }
+    html.light .kr-result-header { border-bottom-color: rgba(236,72,153,0.1); }
+    html.light .kr-result-header-label, html.light .kr-gram-label, html.light .kr-gram-unit { color: rgba(74,7,40,0.45); }
+    html.light .kr-gram-display, html.light .kr-detail-box-val, html.light .kr-history-modal, html.light .kr-history-gram { color: #4A0728; }
+    html.light .kr-kadar-badge { color: #9D174D; }
+    html.light .kr-detail-box { background: #FDF2F8; border-color: rgba(236,72,153,0.12); }
+    html.light .kr-detail-box-label, html.light .kr-detail-box-sub, html.light .kr-history-sub { color: rgba(74,7,40,0.45); }
+    html.light .kr-history-card { background: #fff; border-color: rgba(236,72,153,0.12); }
+    html.light .kr-history-header { border-bottom-color: rgba(236,72,153,0.1); }
+    html.light .kr-history-label { color: rgba(74,7,40,0.45); }
+    html.light .kr-history-row:hover { background: rgba(236,72,153,0.04); }
+    html.light .kr-history-kadar { background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.28); color: #BE185D; }
+    html.light .kr-empty { color: rgba(74,7,40,0.4); }
   </style>
 </head>
 <body>
@@ -1005,6 +1120,7 @@
     <button class="navbar-tab" id="tab-tiktok" onclick="showTab('tiktok')">TikTok</button>
     <button class="navbar-tab" id="tab-charm" onclick="showTab('charm')">Gelang Charm</button>
     <button class="navbar-tab" id="tab-oro" onclick="showTab('oro')">Gelang ORO</button>
+    <button class="navbar-tab" id="tab-kr" onclick="showTab('kr')">💰 KR</button>
     <button class="navbar-tab" id="tab-ocr-harga" onclick="showTab('ocr-harga')">Edit Harga</button>
     <button class="navbar-tab" id="tab-setting" onclick="showTab('setting')">⚙ Setting</button>
   </div>
@@ -1423,6 +1539,69 @@
     <div class="set-actions">
       <button class="btn btn-hitung" onclick="saveChargeSettings()">💾 Simpan & Terapkan</button>
       <button class="btn btn-reset" onclick="resetChargeSettings()">Reset Default</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ PAGE: KR ═══════ -->
+<div id="page-kr" style="display:none" class="pg">
+  <div class="pg-inner">
+
+    <div class="kr-header">
+      <div class="kr-header-title">💰 Kalkulator KR</div>
+      <div class="kr-header-sub">Masukkan modal KR customer — sistem otomatis menentukan kadar & gramasi yang didapat.</div>
+    </div>
+
+    <!-- INPUT CARD -->
+    <div class="kr-input-card">
+      <div class="kr-input-main">
+        <span class="kr-currency-prefix">Rp</span>
+        <input class="kr-input" type="number" id="krInput" placeholder="0"
+          inputmode="numeric" step="1000" min="0"
+          oninput="hitungKR()" onkeydown="if(event.key==='Enter')hitungKR()">
+      </div>
+      <div class="kr-input-hint">Ketik nominal KR, hasil langsung muncul otomatis</div>
+
+      <!-- TIER PILLS -->
+      <div class="kr-tier-indicator">
+        <div class="kr-tier-pill" id="krPill6k">
+          <div class="ktp-dot"></div>6K &lt; Rp1.000.000
+        </div>
+        <div class="kr-tier-pill" id="krPill8k">
+          <div class="ktp-dot"></div>8K &lt; Rp2.000.000
+        </div>
+        <div class="kr-tier-pill" id="krPill16k">
+          <div class="ktp-dot"></div>16K ≥ Rp2.000.000
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="kr-result-card" id="krResultCard">
+      <div class="kr-result-header">
+        <span class="kr-result-header-label">Hasil Kalkulasi KR</span>
+        <button class="copy-btn" id="krCopyBtn" onclick="copyKRResult()" style="display:none">
+          <span class="tip">Salin</span>
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div class="kr-result-main" id="krResultMain">
+        <div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:0.85rem">
+          Masukkan nominal KR untuk melihat hasil
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY CARD -->
+    <div class="kr-history-card">
+      <div class="kr-history-header">
+        <span class="kr-history-label">Riwayat KR</span>
+        <button class="kr-history-clear" onclick="clearKRHistory()">Hapus semua</button>
+      </div>
+      <div class="kr-history-list" id="krHistoryList">
+        <div class="kr-empty">Belum ada riwayat</div>
+      </div>
     </div>
 
   </div>
@@ -2229,7 +2408,7 @@ function copyOro(which){
    TAB
 ══════════════════════════════════ */
 function showTab(tab){
-  ['kalkulator','tiktok','ocr-harga','charm','oro','setting'].forEach(t=>{
+  ['kalkulator','tiktok','ocr-harga','charm','oro','setting','kr'].forEach(t=>{
     const p=document.getElementById('page-'+t);
     if(p)p.style.display=(t===tab)?'':'none';
     const tb=document.getElementById('tab-'+t);
@@ -2237,6 +2416,7 @@ function showTab(tab){
   });
   if(tab==='ocr-harga')fillOcrHargaInputs();
   if(tab==='setting')initSettingPage();
+  if(tab==='kr')renderKRHistory();
 }
 
 /* ══════════════════════════════════
@@ -2587,6 +2767,125 @@ function updatePlatformInfoBadges(){
 
   // Charm & ORO refs
   ['set-charm-shopee-ref'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=`${CHARGE.shopeePct}% (÷${sd.toFixed(4)})`; });
+}
+
+/* ══════════════════════════════════
+   KR KALKULATOR
+══════════════════════════════════ */
+let _krHistory = [];
+try { const s=localStorage.getItem('_kr_history'); if(s) _krHistory=JSON.parse(s); } catch(e){}
+
+function getKRTier(modalKR){
+  if(modalKR < 1000000) return '6K';
+  if(modalKR < 2000000) return '8K';
+  return '16K';
+}
+
+function hitungKR(){
+  const val = parseInt(document.getElementById('krInput').value) || 0;
+  const card = document.getElementById('krResultCard');
+  const main = document.getElementById('krResultMain');
+  const copyBtn = document.getElementById('krCopyBtn');
+
+  // Update tier pills
+  ['krPill6k','krPill8k','krPill16k'].forEach(id => document.getElementById(id).classList.remove('active'));
+  if(val > 0){
+    const tier = getKRTier(val);
+    const pillMap = {'6K':'krPill6k','8K':'krPill8k','16K':'krPill16k'};
+    document.getElementById(pillMap[tier]).classList.add('active');
+  }
+
+  if(!val || val <= 0){
+    card.classList.remove('lit');
+    copyBtn.style.display = 'none';
+    main.innerHTML = `<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:0.85rem">Masukkan nominal KR untuk melihat hasil</div>`;
+    return;
+  }
+
+  const kadar = getKRTier(val);
+  const hpg = (hargaNonPameranUser[kadar] || hargaPameranUser[kadar] || 0);
+
+  if(!hpg || hpg <= 0){
+    card.classList.remove('lit');
+    copyBtn.style.display = 'none';
+    main.innerHTML = `<div style="text-align:center;padding:20px 0;color:var(--red);font-size:0.85rem">⚠ Harga ${kadar} belum diset. Isi harga di tab Edit Harga.</div>`;
+    return;
+  }
+
+  const gramasi = val / hpg;
+  const gramasiDisplay = +gramasi.toFixed(4);
+  const gramasiRound2 = +gramasi.toFixed(2);
+
+  card.classList.add('lit');
+  copyBtn.style.display = '';
+
+  main.innerHTML = `
+    <div class="kr-kadar-badge">
+      ✦ ${kadar} &nbsp;·&nbsp; Non-Pameran
+    </div>
+    <div class="kr-gram-display">${gramasiDisplay.toString().replace('.', ',')}<span class="kr-gram-unit">gram</span></div>
+    <div class="kr-gram-label">Gramasi yang didapat customer</div>
+    <div class="kr-detail-grid">
+      <div class="kr-detail-box">
+        <div class="kr-detail-box-label">Modal KR</div>
+        <div class="kr-detail-box-val">${fmt(val)}</div>
+        <div class="kr-detail-box-sub">Nominal input customer</div>
+      </div>
+      <div class="kr-detail-box">
+        <div class="kr-detail-box-label">Harga/gram ${kadar}</div>
+        <div class="kr-detail-box-val">${fmt(hpg)}</div>
+        <div class="kr-detail-box-sub">Non-Pameran</div>
+      </div>
+      <div class="kr-detail-box">
+        <div class="kr-detail-box-label">Gramasi (4 desimal)</div>
+        <div class="kr-detail-box-val">${gramasiDisplay.toString().replace('.',',')} g</div>
+      </div>
+      <div class="kr-detail-box">
+        <div class="kr-detail-box-label">Gramasi (dibulatkan)</div>
+        <div class="kr-detail-box-val">${gramasiRound2.toString().replace('.',',')} g</div>
+        <div class="kr-detail-box-sub">≈ 2 desimal</div>
+      </div>
+    </div>`;
+
+  // Store last result for copy
+  window._krLastResult = {val, kadar, hpg, gramasi: gramasiDisplay};
+}
+
+function copyKRResult(){
+  const r = window._krLastResult;
+  if(!r) return;
+  const text = `KR ${fmt(r.val)} → ${r.kadar} ${r.gramasi.toString().replace('.',',')}g`;
+  navigator.clipboard.writeText(text).then(()=>toast('Hasil KR disalin','success'));
+  // Save to history
+  _krHistory.unshift({modal:r.val, kadar:r.kadar, gramasi:r.gramasi, hpg:r.hpg, ts:Date.now()});
+  if(_krHistory.length > 30) _krHistory.pop();
+  try{localStorage.setItem('_kr_history', JSON.stringify(_krHistory));}catch(e){}
+  renderKRHistory();
+}
+
+function renderKRHistory(){
+  const list = document.getElementById('krHistoryList');
+  if(!list) return;
+  if(!_krHistory.length){
+    list.innerHTML = '<div class="kr-empty">Belum ada riwayat</div>';
+    return;
+  }
+  list.innerHTML = _krHistory.map((h,i) => `
+    <div class="kr-history-row">
+      <div>
+        <div class="kr-history-modal">${fmt(h.modal)}</div>
+        <div class="kr-history-sub">${fmt(h.hpg)}/gram · ${new Date(h.ts).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <span class="kr-history-kadar">${h.kadar}</span>
+      <div class="kr-history-gram">${h.gramasi.toString().replace('.',',')} g</div>
+    </div>`).join('');
+}
+
+function clearKRHistory(){
+  _krHistory = [];
+  try{localStorage.removeItem('_kr_history');}catch(e){}
+  renderKRHistory();
+  toast('Riwayat KR dihapus','info');
 }
 
 /* ══════════════════════════════════
