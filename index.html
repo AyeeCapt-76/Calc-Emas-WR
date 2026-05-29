@@ -151,6 +151,30 @@
     .tab-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s; }
     .navbar-tab.active .tab-icon { opacity: 1; }
     .navbar-tab:hover .tab-icon { opacity: 0.9; }
+
+    /* ── ONLINE COUNTER ── */
+    .online-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 100px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
+      font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.7);
+      letter-spacing: 0.02em; transition: all 0.3s; white-space: nowrap;
+      margin-left: 8px;
+    }
+    .online-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22C55E; flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(34,197,94,0.8);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 4px rgba(34,197,94,0.6); transform: scale(1); }
+      50% { box-shadow: 0 0 10px rgba(34,197,94,1); transform: scale(1.2); }
+    }
+    html.light .online-pill {
+      background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);
+      color: #166534;
+    }
     .navbar-tab {
       background: none; border: none; color: var(--text-muted);
       font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500;
@@ -1148,6 +1172,10 @@
       <svg class="tab-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
       Setting
     </button>
+  </div>
+  <div class="online-pill" id="onlinePill" title="User sedang online">
+    <div class="online-dot"></div>
+    <span id="onlineCount">—</span>
   </div>
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Ganti tema">🌙</button>
 </nav>
@@ -2914,6 +2942,78 @@ function clearKRHistory(){
 }
 
 /* ══════════════════════════════════
+   ONLINE USERS — SUPABASE
+══════════════════════════════════ */
+const SB_URL  = 'https://ibyjflhaukohogytaqoo.supabase.co';
+const SB_KEY  = 'sb_publishable_GZRdEAzGGtaiMpdE5eSBig_pWDG4B_x';
+const SB_HDR  = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+// Generate unique session ID per tab (not persisted — new ID on each open)
+const _sessionId = 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+let _onlineInterval = null;
+
+async function sbUpsertSession() {
+  try {
+    await fetch(`${SB_URL}/rest/v1/online_users`, {
+      method: 'POST',
+      headers: { ...SB_HDR, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ session_id: _sessionId, last_seen: new Date().toISOString() })
+    });
+  } catch(e) {}
+}
+
+async function sbFetchOnlineCount() {
+  try {
+    // Cleanup stale sessions (>30s) then count
+    await fetch(`${SB_URL}/rest/v1/online_users?last_seen=lt.${new Date(Date.now()-30000).toISOString()}`, {
+      method: 'DELETE', headers: SB_HDR
+    });
+    const res = await fetch(`${SB_URL}/rest/v1/online_users?select=session_id`, {
+      headers: { ...SB_HDR, 'Prefer': 'count=exact', 'Range': '0-0' }
+    });
+    const count = res.headers.get('content-range')?.split('/')[1];
+    updateOnlinePill(count ? parseInt(count) : null);
+  } catch(e) {
+    updateOnlinePill(null);
+  }
+}
+
+function updateOnlinePill(count) {
+  const el = document.getElementById('onlineCount');
+  const pill = document.getElementById('onlinePill');
+  if (!el || !pill) return;
+  if (count === null) {
+    el.textContent = '—';
+    pill.title = 'Tidak dapat memuat data online';
+    return;
+  }
+  el.textContent = count === 1 ? '1 online' : `${count} online`;
+  pill.title = `${count} user sedang membuka kalkulator ini`;
+}
+
+async function initOnlineTracking() {
+  // First upsert then fetch
+  await sbUpsertSession();
+  await sbFetchOnlineCount();
+  // Heartbeat every 20s
+  _onlineInterval = setInterval(async () => {
+    await sbUpsertSession();
+    await sbFetchOnlineCount();
+  }, 20000);
+  // Remove session on tab close
+  window.addEventListener('beforeunload', async () => {
+    try {
+      navigator.sendBeacon(`${SB_URL}/rest/v1/online_users?session_id=eq.${_sessionId}`,
+        new Blob([JSON.stringify({})], { type: 'application/json' })
+      );
+      await fetch(`${SB_URL}/rest/v1/online_users?session_id=eq.${_sessionId}`, {
+        method: 'DELETE', headers: SB_HDR, keepalive: true
+      });
+    } catch(e) {}
+  });
+}
+
+/* ══════════════════════════════════
    INIT
 ══════════════════════════════════ */
 /* ── theme toggle ── */
@@ -2934,6 +3034,8 @@ window.onload=async function(){
   updateTanggalInfo();showTab('kalkulator');
   setSyncStatus('');
   setTimeout(()=>{const g=document.getElementById('gramasi');if(g)g.focus();},80);
+  // Start online tracking
+  initOnlineTracking();
 };
 </script>
 </body>
