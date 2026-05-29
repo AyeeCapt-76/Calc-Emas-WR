@@ -2942,16 +2942,16 @@ function clearKRHistory(){
 }
 
 /* ══════════════════════════════════
-   ONLINE USERS — SUPABASE
+   ONLINE USERS — SUPABASE REALTIME
 ══════════════════════════════════ */
 const SB_URL  = 'https://ibyjflhaukohogytaqoo.supabase.co';
 const SB_KEY  = 'sb_publishable_GZRdEAzGGtaiMpdE5eSBig_pWDG4B_x';
-const SB_HDR  = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+const SB_HDR  = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
 
-// Generate unique session ID per tab (not persisted — new ID on each open)
 const _sessionId = 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now();
-let _onlineInterval = null;
+let _heartbeatInterval = null;
 
+// ── REST helpers ──
 async function sbUpsertSession() {
   try {
     await fetch(`${SB_URL}/rest/v1/online_users`, {
@@ -2962,54 +2962,123 @@ async function sbUpsertSession() {
   } catch(e) {}
 }
 
-async function sbFetchOnlineCount() {
+async function sbDeleteSession() {
   try {
-    // Cleanup stale sessions (>30s) then count
-    await fetch(`${SB_URL}/rest/v1/online_users?last_seen=lt.${new Date(Date.now()-30000).toISOString()}`, {
+    await fetch(`${SB_URL}/rest/v1/online_users?session_id=eq.${_sessionId}`, {
+      method: 'DELETE', headers: SB_HDR, keepalive: true
+    });
+  } catch(e) {}
+}
+
+async function sbCleanupAndCount() {
+  try {
+    // Delete stale sessions > 35s
+    await fetch(`${SB_URL}/rest/v1/online_users?last_seen=lt.${new Date(Date.now()-35000).toISOString()}`, {
       method: 'DELETE', headers: SB_HDR
     });
+    // Count active sessions
     const res = await fetch(`${SB_URL}/rest/v1/online_users?select=session_id`, {
       headers: { ...SB_HDR, 'Prefer': 'count=exact', 'Range': '0-0' }
     });
-    const count = res.headers.get('content-range')?.split('/')[1];
-    updateOnlinePill(count ? parseInt(count) : null);
-  } catch(e) {
-    updateOnlinePill(null);
-  }
+    const raw = res.headers.get('content-range')?.split('/')[1];
+    updateOnlinePill(raw != null ? parseInt(raw) : null);
+  } catch(e) { updateOnlinePill(null); }
 }
 
 function updateOnlinePill(count) {
-  const el = document.getElementById('onlineCount');
+  const el   = document.getElementById('onlineCount');
   const pill = document.getElementById('onlinePill');
   if (!el || !pill) return;
-  if (count === null) {
-    el.textContent = '—';
-    pill.title = 'Tidak dapat memuat data online';
-    return;
-  }
+  if (count === null) { el.textContent = '—'; return; }
   el.textContent = count === 1 ? '1 online' : `${count} online`;
   pill.title = `${count} user sedang membuka kalkulator ini`;
 }
 
+// ── Supabase Realtime via WebSocket ──
+function initRealtimeChannel() {
+  const wsUrl = SB_URL.replace('https://', 'wss://') + '/realtime/v1/websocket?apikey=' + SB_KEY + '&vsn=1.0.0';
+  const ws = new WebSocket(wsUrl);
+  let joined = false;
+  const ref = () => String(Math.floor(Math.random() * 1e9));
+
+  ws.onopen = () => {
+    // Join presence channel
+    ws.send(JSON.stringify({
+      topic: 'realtime:online_users_presence',
+      event: 'phx_join',
+      payload: { config: { broadcast: { self: true }, presence: { key: _sessionId } } },
+      ref: ref()
+    }));
+  };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    // Any change to the table → refetch count
+    if (msg.event === 'postgres_changes' ||
+        msg.event === 'INSERT' || msg.event === 'UPDATE' || msg.event === 'DELETE' ||
+        msg.topic?.includes('online_users')) {
+      sbCleanupAndCount();
+    }
+    if (msg.event === 'phx_reply' && !joined) {
+      joined = true;
+      // Subscribe to postgres changes on online_users
+      ws.send(JSON.stringify({
+        topic: 'realtime:online_users_presence',
+        event: 'phx_join',
+        payload: {
+          config: {
+            postgres_changes: [{ event: '*', schema: 'public', table: 'online_users' }]
+          }
+        },
+        ref: ref()
+      }));
+    }
+  };
+
+  ws.onclose = () => {
+    // Reconnect after 3s if closed unexpectedly
+    setTimeout(initRealtimeChannel, 3000);
+  };
+
+  return ws;
+}
+
+// Also use Supabase JS SDK realtime if available, fallback to short poll
+function initShortPoll() {
+  // Poll every 5s as fallback alongside websocket
+  return setInterval(() => sbCleanupAndCount(), 5000);
+}
+
 async function initOnlineTracking() {
-  // First upsert then fetch
   await sbUpsertSession();
-  await sbFetchOnlineCount();
-  // Heartbeat every 20s
-  _onlineInterval = setInterval(async () => {
+  await sbCleanupAndCount();
+
+  // Heartbeat every 20s to keep session alive
+  _heartbeatInterval = setInterval(async () => {
     await sbUpsertSession();
-    await sbFetchOnlineCount();
   }, 20000);
-  // Remove session on tab close
-  window.addEventListener('beforeunload', async () => {
-    try {
-      navigator.sendBeacon(`${SB_URL}/rest/v1/online_users?session_id=eq.${_sessionId}`,
-        new Blob([JSON.stringify({})], { type: 'application/json' })
-      );
-      await fetch(`${SB_URL}/rest/v1/online_users?session_id=eq.${_sessionId}`, {
-        method: 'DELETE', headers: SB_HDR, keepalive: true
-      });
-    } catch(e) {}
+
+  // Short poll every 5s for near-realtime updates
+  initShortPoll();
+
+  // WebSocket realtime for instant updates
+  initRealtimeChannel();
+
+  // Cleanup on tab close
+  window.addEventListener('beforeunload', () => {
+    sbDeleteSession();
+    clearInterval(_heartbeatInterval);
+  });
+
+  // Also cleanup on visibility change (mobile tab switch)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // Keep session but stop heartbeat to save resources
+    } else {
+      // Came back — refresh immediately
+      sbUpsertSession();
+      sbCleanupAndCount();
+    }
   });
 }
 
