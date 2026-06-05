@@ -928,6 +928,324 @@
     /* ════════════════════════════
        KR PAGE
     ════════════════════════════ */
+
+    <!-- KR PAGE - MARKETPLACE SPECIFIC CALCULATION -->
+<!-- Add this section to replace/enhance the existing KR page in index.html -->
+
+<div id="page-kr" class="pg" style="display: none;">
+  <div class="pg-inner">
+    <!-- Header -->
+    <div class="kr-header">
+      <h3 class="kr-header-title">🔄 Konversi Rupiah</h3>
+      <p class="kr-header-sub">Hitung gram emas berdasarkan modal rupiah dengan charge marketplace yang berbeda</p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="kr-input-card">
+      <div class="kr-input-main">
+        <span class="kr-currency-prefix">Rp</span>
+        <input 
+          type="number" 
+          id="kr-input" 
+          class="kr-input" 
+          placeholder="Masukkan modal"
+          min="0"
+          step="100000"
+        />
+      </div>
+      <p class="kr-input-hint">Masukkan jumlah modal dalam Rupiah</p>
+
+      <!-- Kadar Selection -->
+      <div class="kr-tier-indicator">
+        <button class="kr-tier-pill active" data-kadar="75">
+          <span class="ktp-dot"></span>
+          <span>75K</span>
+        </button>
+        <button class="kr-tier-pill" data-kadar="80">
+          <span class="ktp-dot"></span>
+          <span>80K</span>
+        </button>
+        <button class="kr-tier-pill" data-kadar="90">
+          <span class="ktp-dot"></span>
+          <span>90K</span>
+        </button>
+        <button class="kr-tier-pill" data-kadar="99">
+          <span class="ktp-dot"></span>
+          <span>99K</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="kr-results-container">
+      <!-- Shopee Result -->
+      <div class="kr-result-card" id="kr-shopee-result">
+        <div class="kr-result-header">
+          <span class="kr-result-header-label">🛒 Shopee</span>
+          <span class="kr-result-header-label" style="font-size: 0.75rem; color: #A78BFA;">Charge: 6.5%</span>
+        </div>
+        <div class="kr-result-main">
+          <div class="kr-kadar-badge">
+            <span>75K</span>
+          </div>
+          <div class="kr-gram-display" id="shopee-gram">-</div>
+          <div class="kr-gram-label">Berat emas yang diterima</div>
+          
+          <div class="kr-detail-grid">
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Modal</div>
+              <div id="shopee-modal" style="font-size: 1rem; font-weight: 700; color: #FFFFFF;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Charge</div>
+              <div id="shopee-charge" style="font-size: 1rem; font-weight: 700; color: #F87171;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Diterima</div>
+              <div id="shopee-after" style="font-size: 1rem; font-weight: 700; color: #22C55E;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Harga/Gram</div>
+              <div id="shopee-price" style="font-size: 0.9rem; font-weight: 700; color: #A78BFA;">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TikTok Result -->
+      <div class="kr-result-card" id="kr-tiktok-result">
+        <div class="kr-result-header">
+          <span class="kr-result-header-label">🎵 TikTok Shop</span>
+          <span class="kr-result-header-label" id="tiktok-charge-label" style="font-size: 0.75rem; color: #A78BFA;">Charge: 13%</span>
+        </div>
+        <div class="kr-result-main">
+          <div class="kr-kadar-badge">
+            <span>75K</span>
+          </div>
+          <div class="kr-gram-display" id="tiktok-gram">-</div>
+          <div class="kr-gram-label">Berat emas yang diterima</div>
+          
+          <div class="kr-detail-grid">
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Modal</div>
+              <div id="tiktok-modal" style="font-size: 1rem; font-weight: 700; color: #FFFFFF;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Charge</div>
+              <div id="tiktok-charge" style="font-size: 1rem; font-weight: 700; color: #F87171;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Diterima</div>
+              <div id="tiktok-after" style="font-size: 1rem; font-weight: 700; color: #22C55E;">-</div>
+            </div>
+            <div class="kr-detail-box">
+              <div class="kr-detail-box-label">Harga/Gram</div>
+              <div id="tiktok-price" style="font-size: 0.9rem; font-weight: 700; color: #A78BFA;">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Info -->
+      <div class="info-badge" id="kr-comparison-info" style="display: none;">
+        <div style="flex: 1;">
+          <div style="font-size: 0.75rem; margin-bottom: 6px;">
+            <b id="better-marketplace">Shopee</b> lebih untung 
+            <span id="gram-difference" style="color: #22C55E; font-weight: 700;">+0.XXX gr</span>
+          </div>
+          <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">
+            Perbedaan: <span id="percent-difference">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threshold Warning untuk TikTok -->
+      <div class="info-badge" id="kr-tiktok-threshold-warning" style="display: none; background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3);">
+        <div style="color: #FBBF24;">
+          ⚠️ Charge TikTok berubah di <b>Rp 1.300.000</b>
+          <div style="font-size: 0.7rem; margin-top: 4px; color: rgba(255,255,255,0.6);">
+            &lt; Rp 1.3M: 13% | ≥ Rp 1.3M: 9.5%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT untuk KR Calculator -->
+<!-- ═════════════════════════════════════════════════ -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // ─────────────────────────────────────────────
+  // SELECTOR ELEMENTS
+  // ─────────────────────────────────────────────
+  const krInput = document.getElementById('kr-input');
+  const kadarButtons = document.querySelectorAll('.kr-tier-pill');
+  
+  let selectedKadar = 75;
+  let hargaPerGram = 700000; // Default, akan diambil dari localStorage
+
+  // ─────────────────────────────────────────────
+  // LOAD HARGA EMAS
+  // ─────────────────────────────────────────────
+  function loadHargaEmas() {
+    const stored = localStorage.getItem('hargaEmas');
+    if (stored) {
+      hargaPerGram = parseInt(stored);
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // FORMULA CALCULATION
+  // ─────────────────────────────────────────────
+  function calculateKR(modal, kadar, marketplace) {
+    if (!modal || modal <= 0) return null;
+
+    let chargeRate;
+    let chargeLabel;
+
+    if (marketplace === 'shopee') {
+      chargeRate = 0.065; // 6.5%
+      chargeLabel = '6.5%';
+    } else if (marketplace === 'tiktok') {
+      // TikTok charge tergantung modal
+      if (modal >= 1300000) {
+        chargeRate = 0.095; // 9.5%
+        chargeLabel = '9.5%';
+      } else {
+        chargeRate = 0.13; // 13%
+        chargeLabel = '13%';
+      }
+    }
+
+    // Rumus: (Modal - (Modal × Charge%)) / (Harga per Gram × Kadar%)
+    const chargeAmount = modal * chargeRate;
+    const afterCharge = modal - chargeAmount;
+    const pricePerKadar = hargaPerGram * (kadar / 100);
+    const gram = afterCharge / pricePerKadar;
+
+    return {
+      modal,
+      kadar,
+      chargeRate: chargeLabel,
+      chargeAmount: Math.round(chargeAmount),
+      afterCharge: Math.round(afterCharge),
+      pricePerKadar,
+      hargaPerGram,
+      gram: gram.toFixed(3)
+    };
+  }
+
+  // ─────────────────────────────────────────────
+  // FORMAT CURRENCY
+  // ─────────────────────────────────────────────
+  function formatCurrency(num) {
+    return `Rp ${Math.round(num).toLocaleString('id-ID')}`;
+  }
+
+  // ─────────────────────────────────────────────
+  // UPDATE SHOPEE RESULT
+  // ─────────────────────────────────────────────
+  function updateShopeeResult(modal, kadar) {
+    const result = calculateKR(modal, kadar, 'shopee');
+    if (!result) return;
+
+    document.getElementById('shopee-gram').textContent = result.gram;
+    document.getElementById('shopee-modal').textContent = formatCurrency(result.modal);
+    document.getElementById('shopee-charge').textContent = `${result.chargeRate} (${formatCurrency(result.chargeAmount)})`;
+    document.getElementById('shopee-after').textContent = formatCurrency(result.afterCharge);
+    document.getElementById('shopee-price').textContent = formatCurrency(result.hargaPerGram);
+
+    // Update kadar badge
+    document.querySelector('#kr-shopee-result .kr-kadar-badge span').textContent = `${kadar}K`;
+  }
+
+  // ─────────────────────────────────────────────
+  // UPDATE TIKTOK RESULT
+  // ─────────────────────────────────────────────
+  function updateTikTokResult(modal, kadar) {
+    const result = calculateKR(modal, kadar, 'tiktok');
+    if (!result) return;
+
+    document.getElementById('tiktok-gram').textContent = result.gram;
+    document.getElementById('tiktok-modal').textContent = formatCurrency(result.modal);
+    document.getElementById('tiktok-charge').textContent = `${result.chargeRate} (${formatCurrency(result.chargeAmount)})`;
+    document.getElementById('tiktok-after').textContent = formatCurrency(result.afterCharge);
+    document.getElementById('tiktok-price').textContent = formatCurrency(result.hargaPerGram);
+    document.getElementById('tiktok-charge-label').textContent = `Charge: ${result.chargeRate}`;
+
+    // Update kadar badge
+    document.querySelector('#kr-tiktok-result .kr-kadar-badge span').textContent = `${kadar}K`;
+
+    // Show threshold warning jika dekat dengan 1.3juta
+    const warningEl = document.getElementById('kr-tiktok-threshold-warning');
+    if ((modal >= 1200000 && modal <= 1400000)) {
+      warningEl.style.display = 'flex';
+    } else {
+      warningEl.style.display = 'none';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // UPDATE COMPARISON
+  // ─────────────────────────────────────────────
+  function updateComparison(modal, kadar) {
+    const shopee = calculateKR(modal, kadar, 'shopee');
+    const tiktok = calculateKR(modal, kadar, 'tiktok');
+
+    if (!shopee || !tiktok) return;
+
+    const shopeeGram = parseFloat(shopee.gram);
+    const tiktokGram = parseFloat(tiktok.gram);
+    const diff = shopeeGram - tiktokGram;
+    const percent = (diff / Math.min(shopeeGram, tiktokGram) * 100).toFixed(2);
+
+    const infoEl = document.getElementById('kr-comparison-info');
+    const betterMarketplace = shopeeGram > tiktokGram ? 'Shopee' : 'TikTok';
+    const gramDiff = Math.abs(diff).toFixed(3);
+
+    document.getElementById('better-marketplace').textContent = betterMarketplace;
+    document.getElementById('gram-difference').textContent = `+${gramDiff} gr`;
+    document.getElementById('percent-difference').textContent = `${Math.abs(percent)}%`;
+
+    infoEl.style.display = 'flex';
+  }
+
+  // ─────────────────────────────────────────────
+  // CALCULATE ALL
+  // ─────────────────────────────────────────────
+  function calculateAll() {
+    const modal = parseInt(krInput.value) || 0;
+    if (modal <= 0) return;
+
+    updateShopeeResult(modal, selectedKadar);
+    updateTikTokResult(modal, selectedKadar);
+    updateComparison(modal, selectedKadar);
+  }
+
+  // ─────────────────────────────────────────────
+  // EVENT LISTENERS
+  // ─────────────────────────────────────────────
+  krInput.addEventListener('input', calculateAll);
+  krInput.addEventListener('change', calculateAll);
+
+  kadarButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      kadarButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      selectedKadar = parseInt(this.dataset.kadar);
+      calculateAll();
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────
+  loadHargaEmas();
+});
+</script>
     <!-- KR PAGE - MARKETPLACE SPECIFIC CALCULATION -->
 <!-- Add this section to replace/enhance the existing KR page in index.html -->
 
