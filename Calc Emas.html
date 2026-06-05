@@ -62,6 +62,29 @@
       border: 1px solid #ccc;
       margin-bottom: 10px;
       font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .platform-grid button {
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #e0e0e0;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .platform-grid button.active {
+      background: #ff6b35;
+      color: #fff;
     }
 
     .kadar-grid {
@@ -141,6 +164,12 @@
       <option value="non">Harga Non-Pameran</option>
     </select>
 
+    <label>Pilih Platform</label>
+    <div class="platform-grid" id="platformButtons">
+      <button onclick="selectPlatform('tiktok')">TikTok</button>
+      <button onclick="selectPlatform('shopee')">Shopee</button>
+    </div>
+
     <label>Gramasi (gram)</label>
     <input type="number" id="gramasi" placeholder="Contoh: 3.5">
 
@@ -170,10 +199,24 @@
       <div><input id="harga9Kp" placeholder="9Kp"></div>
       <div><input id="harga24K" placeholder="24K"></div>
     </div>
+
+    <!-- Platform Charge Settings -->
+    <div class="section-title">Pengaturan Charge Platform (%)</div>
+    <div class="harga-kadar-edit">
+      <div>
+        <label style="margin-top: 0; font-size: 12px;">TikTok Charge</label>
+        <input id="chargeTiktok" type="number" placeholder="6.5" value="6.5">
+      </div>
+      <div>
+        <label style="margin-top: 0; font-size: 12px;">Shopee Charge</label>
+        <input id="chargeShopee" type="number" placeholder="6" value="6">
+      </div>
+    </div>
   </div>
 
   <script>
     let kadarTerpilih = null;
+    let platformTerpilih = 'tiktok';
 
     const hargaPameran = {
       "6K": 740000, "8K": 830000, "9K": 880000, "16K": 1405000,
@@ -195,6 +238,13 @@
       }
     }
 
+    function selectPlatform(platform) {
+      platformTerpilih = platform;
+      const buttons = document.querySelectorAll('.platform-grid button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
     function selectKadar(kadar) {
       kadarTerpilih = kadar;
       const buttons = document.querySelectorAll('.kadar-grid button');
@@ -209,14 +259,27 @@
 
       const hargaPerGram = parseFloat(document.getElementById("harga" + kadarTerpilih).value);
       const total = gramasi * hargaPerGram;
-      const marketplaceRaw = total / 0.935;
+      
+      // Get platform charge
+      const charge = platformTerpilih === 'tiktok' 
+        ? parseFloat(document.getElementById("chargeTiktok").value) 
+        : parseFloat(document.getElementById("chargeShopee").value);
+      
+      // Calculate marketplace price with platform charge
+      const chargeDecimal = 1 - (charge / 100);
+      const marketplaceRaw = total / chargeDecimal;
       const marketplaceRounded = Math.ceil(marketplaceRaw / 1000) * 1000;
+
+      const platformName = platformTerpilih === 'tiktok' ? 'TikTok' : 'Shopee';
 
       document.getElementById("hasilHarga").innerText = 
         `Total Harga: Rp ${total.toLocaleString('id-ID')}`;
       document.getElementById("hargaMarketplace").innerText = 
-        `Harga Marketplace: Rp ${marketplaceRounded.toLocaleString('id-ID')}`;
+        `Harga ${platformName}: Rp ${marketplaceRounded.toLocaleString('id-ID')}`;
     }
+
+    // Set default platform button as active
+    document.querySelectorAll('.platform-grid button')[0].classList.add('active');
 
     updateHargaKadar();
   </script>
