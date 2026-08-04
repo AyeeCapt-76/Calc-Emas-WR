@@ -3335,15 +3335,23 @@ const CHARGE_DEFAULT = {
 
 let CHARGE = {...CHARGE_DEFAULT};
 
-function loadCharge(){
+async function loadCharge(){
+  const d = await hgFetchKey('charge_settings');
+  if(d){
+    CHARGE = {...CHARGE_DEFAULT, ...d};
+    try{localStorage.setItem('_charge_settings',JSON.stringify(CHARGE));}catch(e){}
+    return;
+  }
   try {
     const s = localStorage.getItem('_charge_settings');
     if(s) CHARGE = {...CHARGE_DEFAULT, ...JSON.parse(s)};
   } catch(e){}
 }
 
-function saveCharge(){
+async function saveCharge(){
+  const ok = await hgSaveKey('charge_settings', CHARGE);
   try { localStorage.setItem('_charge_settings', JSON.stringify(CHARGE)); } catch(e){}
+  return ok;
 }
 
 // Divisor dari persen charge: charge 6.5% → divisor = 1 - 0.065 = 0.935
@@ -3423,7 +3431,7 @@ function updateSettingPreview(){
   setTxt('sum-tikb-markup', tbp ? '+'+tbmk+'%' : '—');
 }
 
-function saveChargeSettings(){
+async function saveChargeSettings(){
   const sp = parseFloat(document.getElementById('set-shopee-pct').value);
   const tsp = parseFloat(document.getElementById('set-tik-small-pct').value);
   const tbp = parseFloat(document.getElementById('set-tik-big-pct').value);
@@ -3433,20 +3441,20 @@ function saveChargeSettings(){
   if(isNaN(tbp)||tbp<=0||tbp>=100) return toast('Charge TikTok Besar tidak valid','error');
   if(isNaN(thr)||thr<=0) return toast('Threshold tidak valid','error');
   CHARGE = {shopeePct:sp, tikSmallPct:tsp, tikBigPct:tbp, tikThreshold:thr};
-  saveCharge();
+  const ok = await saveCharge();
   refreshAllCalc();
   updatePlatformInfoBadges();
-  toast('✅ Setting charge disimpan — semua kalkulasi diperbarui','success',3000);
+  toast(ok?'✅ Charge disimpan ke database — berlaku untuk semua user':'⚠ Gagal konek database, disimpan lokal saja', ok?'success':'error',3200);
 }
 
-function resetChargeSettings(){
+async function resetChargeSettings(){
   if(!confirm('Reset ke default? (Shopee 6.5%, TikTok 11%/10%)')) return;
   CHARGE = {...CHARGE_DEFAULT};
-  saveCharge();
+  const ok = await saveCharge();
   initSettingPage();
   refreshAllCalc();
   updatePlatformInfoBadges();
-  toast('Setting direset ke default','info');
+  toast(ok?'Setting direset & tersimpan ke database':'Direset lokal (database gagal)','info');
 }
 
 function refreshAllCalc(){
