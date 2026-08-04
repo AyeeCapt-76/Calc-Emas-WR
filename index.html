@@ -1392,7 +1392,25 @@ document.addEventListener('DOMContentLoaded', function() {
   border-top:8px solid var(--gold); display:none;
 }
 .theme-card.active .theme-card-arrow{display:block}
-  </style>
+<style>
+/* ══ FIX PAKSA: batasi lebar tab KR agar tidak full-screen ══ */
+#page-kr.pg { display: block; }
+#page-kr .pg-inner {
+  max-width: 720px !important;
+  margin: 0 auto !important;
+  padding: 28px 20px 60px !important;
+  box-sizing: border-box !important;
+}
+#page-kr .kr-input-card,
+#page-kr .kr-result-card,
+#page-kr .kr-history-card {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 600px) {
+  #page-kr .pg-inner { padding: 14px 12px 48px !important; }
+}
+</style>
 </head>
 <body>
 
