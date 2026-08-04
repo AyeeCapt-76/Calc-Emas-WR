@@ -2319,40 +2319,57 @@ const hPamDefault={"6K":735000,"8K":825000,"9K":865000,"16K":1375000,"17K":15150
 const hNonDefault={"6K":715000,"8K":805000,"9K":845000,"16K":1355000,"17K":1495000,"8Kp":815000,"9Kp":855000,"24K":2100000};
 let hargaPameranUser={...hPamDefault}, hargaNonPameranUser={...hNonDefault};
 let _lastTgl=null;
-const CLOUD_KEY='harga-emas-v1';
+/* ── Koneksi Supabase khusus harga & charge (shared/database) ── */
+const HG_SB_URL = 'https://vqgkwmqeujmiarciqizs.supabase.co';
+const HG_SB_KEY = 'sb_publishable_c-AJcmxkPu6xPv0eKLG85w_qliGLAKz';
+const HG_SB_HDR = { 'apikey': HG_SB_KEY, 'Authorization': `Bearer ${HG_SB_KEY}`, 'Content-Type': 'application/json' };
+
+async function hgFetchKey(key){
+  try{
+    const res = await fetch(`${HG_SB_URL}/rest/v1/app_settings?key=eq.${key}&select=value`, { headers: HG_SB_HDR });
+    if(!res.ok) return null;
+    const rows = await res.json();
+    return (rows && rows[0]) ? rows[0].value : null;
+  }catch(e){ return null; }
+}
+
+async function hgSaveKey(key, value){
+  try{
+    const res = await fetch(`${HG_SB_URL}/rest/v1/app_settings`, {
+      method:'POST',
+      headers:{...HG_SB_HDR, 'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify({ key, value, updated_at: new Date().toISOString() })
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
 
 async function loadHarga(){
-  // 1. cloud first
-  try{
-    const res=await window.storage.get(CLOUD_KEY);
-    if(res&&res.value){
-      const d=JSON.parse(res.value);
-      if(d.pameran) hargaPameranUser=d.pameran;
-      if(d.non)     hargaNonPameranUser=d.non;
-      if(d.tgl)     _lastTgl=d.tgl;
-      return;
-    }
-  }catch(e){}
-  // 2. localStorage fallback (offline / storage unavailable)
+  // 1. database (shared ke semua user/device)
+  const d = await hgFetchKey('harga_emas');
+  if(d){
+    if(d.pameran) hargaPameranUser=d.pameran;
+    if(d.non)     hargaNonPameranUser=d.non;
+    if(d.tgl)     _lastTgl=d.tgl;
+    try{localStorage.setItem('_harga_data',JSON.stringify(d));}catch(e){}
+    return;
+  }
+  // 2. localStorage fallback (offline / database belum bisa diakses)
   try{
     const c=localStorage.getItem('_harga_data');
-    if(c){const d=JSON.parse(c);if(d.pameran)hargaPameranUser=d.pameran;if(d.non)hargaNonPameranUser=d.non;if(d.tgl)_lastTgl=d.tgl;}
+    if(c){const dd=JSON.parse(c);if(dd.pameran)hargaPameranUser=dd.pameran;if(dd.non)hargaNonPameranUser=dd.non;if(dd.tgl)_lastTgl=dd.tgl;}
   }catch(e){}
 }
 
 async function saveHarga(){
   _lastTgl=(()=>{const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;})();
-  const payload=JSON.stringify({pameran:hargaPameranUser,non:hargaNonPameranUser,tgl:_lastTgl});
+  const payload={pameran:hargaPameranUser,non:hargaNonPameranUser,tgl:_lastTgl};
   setSyncStatus('saving');
-  // save to cloud
-  let ok=false;
-  try{await window.storage.set(CLOUD_KEY,payload);ok=true;}catch(e){}
-  // mirror to localStorage
-  try{localStorage.setItem('_harga_data',payload);}catch(e){}
+  const ok = await hgSaveKey('harga_emas', payload);
+  try{localStorage.setItem('_harga_data',JSON.stringify(payload));}catch(e){}
   updateTanggalInfo();
   setSyncStatus(ok?'synced':'local');
 }
-
 /* ── sync status badge ── */
 function setSyncStatus(state){
   const el=document.getElementById('syncStatus');
