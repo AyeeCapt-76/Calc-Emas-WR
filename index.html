@@ -10,6 +10,7 @@
     /* ── DARK THEME — Pink Dashboard ── */
     :root {
       --gold: #F472B6;          /* pink accent */
+      --gold-rgb: 244,114,182;  /* rgb dari --gold, untuk rgba() dinamis */
       --gold-light: #FBCFE8;    /* pink light */
       --gold-pale: #FCE7F3;     /* pink pale */
       --gold-dim: #BE185D;      /* pink dim */
@@ -52,6 +53,7 @@
       --text-muted: rgba(74,7,40,0.42);
       --text-dim: rgba(74,7,40,0.22);
       --gold: #EC4899;
+      --gold-rgb: 236,72,153;
       --gold-light: #BE185D;
       --gold-pale: #9D174D;
       --gold-dim: #F9A8D4;
@@ -295,9 +297,9 @@
     }
     .kadar-btn:hover { border-color: var(--gold-dim); color: var(--text); transform: translateY(-1px); background: rgba(244,114,182,0.08); }
     .kadar-btn.active {
-      background: linear-gradient(145deg, rgba(244,114,182,0.25), rgba(244,114,182,0.10));
+      background: linear-gradient(145deg, rgba(var(--gold-rgb),0.25), rgba(var(--gold-rgb),0.10));
       border-color: var(--gold); color: #FFFFFF;
-      box-shadow: 0 0 14px rgba(244,114,182,0.25), inset 0 1px 0 rgba(244,114,182,0.25);
+      box-shadow: 0 0 14px rgba(var(--gold-rgb),0.25), inset 0 1px 0 rgba(var(--gold-rgb),0.25);
     }
     .kadar-btn.pop { animation: kPop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
     @keyframes kPop { 0%{transform:scale(0.93)} 100%{transform:scale(1)} }
@@ -328,9 +330,9 @@
     }
     .toggle-btn:hover:not(.active) { border-color: var(--gold-dim); color: var(--text); background: rgba(244,114,182,0.06); }
     .toggle-btn.active {
-      background: linear-gradient(145deg,rgba(244,114,182,0.25),rgba(244,114,182,0.10)) !important;
+      background: linear-gradient(145deg,rgba(var(--gold-rgb),0.25),rgba(var(--gold-rgb),0.10)) !important;
       border-color: var(--gold) !important; color: #FFFFFF !important;
-      box-shadow: 0 0 12px rgba(244,114,182,0.22);
+      box-shadow: 0 0 12px rgba(var(--gold-rgb),0.22);
     }
     .error-msg { display: none; }
 
@@ -342,17 +344,18 @@
       display: flex; align-items: center; justify-content: center; gap: 7px;
     }
     .btn-hitung {
-      background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
       color: #FFFFFF; margin-top: 16px;
-      box-shadow: 0 4px 18px rgba(236,72,153,0.4);
+      box-shadow: 0 4px 18px rgba(var(--gold-rgb),0.4);
       position: relative; overflow: hidden;
+      transition: all 0.2s, background 0.25s;
     }
     .btn-hitung::before {
       content: ''; position: absolute; top:0; left:-100%; width:100%; height:100%;
       background: linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
       transition: left 0.42s;
     }
-    .btn-hitung:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(236,72,153,0.5); }
+    .btn-hitung:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(var(--gold-rgb),0.5); }
     .btn-hitung:hover::before { left: 100%; }
     .btn-hitung:active { transform: none; }
     .btn-reset {
@@ -599,14 +602,14 @@
     html.light .navbar-name { color: #4A0728; }
 
     /* Kadar buttons */
-    html.light .kadar-btn { border-color: rgba(236,72,153,0.25); color: #9D174D; background: rgba(255,255,255,0.7); }
-    html.light .kadar-btn:hover { background: rgba(236,72,153,0.1); color: #BE185D; }
-    html.light .kadar-btn.active { background: linear-gradient(145deg,rgba(236,72,153,0.22),rgba(236,72,153,0.1)); border-color: #EC4899; color: #9D174D; box-shadow: 0 0 12px rgba(236,72,153,0.2); }
+    html.light .kadar-btn { border-color: rgba(var(--gold-rgb),0.25); color: var(--gold-light); background: rgba(255,255,255,0.7); }
+    html.light .kadar-btn:hover { background: rgba(var(--gold-rgb),0.1); color: var(--gold); }
+    html.light .kadar-btn.active { background: linear-gradient(145deg,rgba(var(--gold-rgb),0.22),rgba(var(--gold-rgb),0.1)); border-color: var(--gold); color: var(--text); box-shadow: 0 0 12px rgba(var(--gold-rgb),0.2); }
 
     /* Toggle buttons (Pameran/Non) */
-    html.light .toggle-btn { color: rgba(74,7,40,0.55); border-color: rgba(236,72,153,0.2); background: rgba(255,255,255,0.6); }
-    html.light .toggle-btn.active { background: linear-gradient(145deg,rgba(236,72,153,0.18),rgba(236,72,153,0.08)) !important; border-color: #EC4899 !important; color: #BE185D !important; }
-    html.light .toggle-btn:hover:not(.active) { color: #9D174D; background: rgba(236,72,153,0.07); }
+    html.light .toggle-btn { color: var(--text-sub); border-color: rgba(var(--gold-rgb),0.2); background: rgba(255,255,255,0.6); }
+    html.light .toggle-btn.active { background: linear-gradient(145deg,rgba(var(--gold-rgb),0.18),rgba(var(--gold-rgb),0.08)) !important; border-color: var(--gold) !important; color: var(--text) !important; }
+    html.light .toggle-btn:hover:not(.active) { color: var(--gold); background: rgba(var(--gold-rgb),0.07); }
 
     /* Card & labels */
     html.light .card::before { opacity: 0.35; }
@@ -876,10 +879,10 @@
       cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em;
     }
     .gm-btn-primary {
-      background: linear-gradient(135deg, #EC4899, #BE185D);
-      color: #fff; box-shadow: 0 4px 14px rgba(236,72,153,0.4);
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff; box-shadow: 0 4px 14px rgba(var(--gold-rgb),0.4);
     }
-    .gm-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(236,72,153,0.5); }
+    .gm-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(var(--gold-rgb),0.5); }
     .gm-btn-secondary {
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
       color: rgba(255,255,255,0.7);
@@ -963,8 +966,8 @@
       background: var(--surface-2); transition: all 0.18s; user-select: none;
     }
     .kr-tier-pill.active {
-      background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(244,114,182,0.08));
-      border-color: var(--gold); color: var(--text); box-shadow: 0 0 12px rgba(244,114,182,0.2);
+      background: linear-gradient(135deg, rgba(var(--gold-rgb),0.2), rgba(var(--gold-rgb),0.08));
+      border-color: var(--gold); color: var(--text); box-shadow: 0 0 12px rgba(var(--gold-rgb),0.2);
     }
     .ktp-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; transition: background 0.18s; }
     .kr-tier-pill.active .ktp-dot { background: var(--gold); }
@@ -1220,13 +1223,13 @@
     <span id="onlineCount">—</span>
   </div>
 <button class="theme-toggle" id="themeToggle" onclick="openThemePicker()" title="Ganti tema">🎨</button>
+</nav>
 
 <div class="theme-picker-overlay" id="themePickerOverlay" onclick="closeThemePicker()"></div>
 <div class="theme-picker-panel" id="themePickerPanel">
   <div class="theme-picker-title">Pilih Tema</div>
   <div class="theme-picker-row" id="themePickerRow"></div>
 </div>
-</nav>
 <div class="update-info" id="updateInfo">Update 31 July 2025 &nbsp;<span id="syncStatus"></span></div>
 
 <!-- ═══════ PAGE: SHOPEE ═══════ -->
@@ -2397,7 +2400,7 @@ function showManualInputOCR(box, msg=''){
       `).join('')}
     </div>
     <button onclick="simpanHargaOcr();toast('Harga disimpan','success')"
-      style="width:100%;height:42px;background:linear-gradient(135deg,#EC4899,#BE185D);
+      style="width:100%;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-light));
              border:none;border-radius:10px;color:#FFFFFF;font-family:'Inter',sans-serif;
              font-size:0.9rem;font-weight:700;cursor:pointer">
       ✓ Simpan ke Kalkulator
@@ -3208,6 +3211,7 @@ function applyTheme(id, save=true){
   root.setProperty('--border-mid', t.borderMid);
   root.setProperty('--border-strong', t.borderMid.replace(/[\d.]+\)$/,'.6)'));
   root.setProperty('--gold', t.gold);
+  root.setProperty('--gold-rgb', hexToRgb(t.gold));
   root.setProperty('--gold-light', t.goldLight);
   root.setProperty('--gold-pale', t.goldLight);
   root.setProperty('--gold-dim', t.goldLight);
