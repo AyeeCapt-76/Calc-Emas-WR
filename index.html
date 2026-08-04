@@ -3751,20 +3751,61 @@ function toggleTheme(){
   document.getElementById('themeToggle').textContent=isLight?'☀️':'🌙';
   try{localStorage.setItem('_theme',isLight?'light':'dark');}catch(e){}
 }
+/* ══════════════════════════════════
+   REALTIME SYNC — harga & charge (auto update ke semua user)
+══════════════════════════════════ */
+function initHargaRealtime(){
+  const wsUrl = HG_SB_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + HG_SB_KEY + '&vsn=1.0.0';
+  const ws = new WebSocket(wsUrl);
+  const ref = () => String(Math.floor(Math.random()*1e9));
 
+  ws.onopen = () => {
+    ws.send(JSON.stringify({
+      topic: 'realtime:app_settings_changes',
+      event: 'phx_join',
+      payload: { config: { broadcast:{self:false}, postgres_changes: [{ event:'*', schema:'public', table:'app_settings' }] } },
+      ref: ref()
+    }));
+  };
+
+  ws.onmessage = async (e) => {
+    const msg = JSON.parse(e.data);
+    if(msg.event === 'postgres_changes'){
+      await loadHarga();
+      await loadCharge();
+      renderHargaKadar(); renderDB(); updateHS(); renderDBT(); updateHT(); updatePlatformInfoBadges();
+      const setP = document.getElementById('page-setting');
+      if(setP && setP.style.display !== 'none') initSettingPage();
+      const ocrP = document.getElementById('page-ocr-harga');
+      if(ocrP && ocrP.style.display !== 'none') fillOcrHargaInputs();
+      toast('🔄 Harga/charge diperbarui oleh user lain','info',2500);
+    }
+  };
+
+  ws.onclose = () => setTimeout(initHargaRealtime, 3000);
+  return ws;
+}
+
+document.addEventListener('visibilitychange', async () => {
+  if(!document.hidden){
+    await loadHarga(); await loadCharge();
+    renderHargaKadar(); renderDB(); updateHS(); renderDBT(); updateHT(); updatePlatformInfoBadges();
+  }
+});
+  
 window.onload=async function(){
-  loadCharge();
   // restore saved theme
   try{if(localStorage.getItem('_theme')==='light'){document.documentElement.classList.add('light');document.getElementById('themeToggle').textContent='☀️';}}catch(e){}
   setSyncStatus('saving');
+  await loadCharge();
   await loadHarga();
   renderHargaKadar();renderDB();renderDBT();
   updatePlatformInfoBadges();
   updateTanggalInfo();showTab('kalkulator');
   setSyncStatus('');
   setTimeout(()=>{const g=document.getElementById('gramasi');if(g)g.focus();},80);
-  // Start online tracking
   initOnlineTracking();
+  initHargaRealtime();
 };
 </script>
 </body>
