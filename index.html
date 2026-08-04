@@ -1675,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', function() {
     html.light .kr-history-kadar { background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.28); color: #BE185D; }
     html.light .kr-empty { color: rgba(74,7,40,0.4); }
 
-    /* ══ THEME PICKER ══ */
+   /* ══ THEME PICKER ══ */
 .theme-picker-overlay{
   display:none; position:fixed; inset:0; z-index:9998;
   background:rgba(0,0,0,0.35);
@@ -3789,6 +3789,9 @@ async function initOnlineTracking() {
 /* ══════════════════════════════════
    THEME SWITCHER — multi tema
 ══════════════════════════════════ */
+/* ══════════════════════════════════
+   THEME SWITCHER — multi tema
+══════════════════════════════════ */
 const THEMES = [
   { id:'classic',    name:'Classic',        dark:false, bg:'#FDF2F8', surface:'#FFFFFF', surface2:'#FCE7F3', surface3:'#FBCFE8', text:'#4A0728', textSub:'rgba(74,7,40,.65)', textMuted:'rgba(74,7,40,.42)', border:'rgba(236,72,153,.18)', borderMid:'rgba(236,72,153,.32)', gold:'#EC4899', goldLight:'#BE185D', green:'#EC4899', red:'#DC2626',
     dots:['#EC4899','#14B8A6','#D1D5DB','#4B5563','#111827'] },
@@ -3916,8 +3919,6 @@ document.addEventListener('visibilitychange', async () => {
 });
   
 window.onload=async function(){
-  // restore saved theme
-  // restore saved theme
   try{
     const savedTheme = localStorage.getItem('_theme_id') || (localStorage.getItem('_theme')==='light' ? 'classic' : 'dark');
     applyTheme(savedTheme, false);
