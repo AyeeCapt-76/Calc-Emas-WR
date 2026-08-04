@@ -1674,6 +1674,41 @@ document.addEventListener('DOMContentLoaded', function() {
     html.light .kr-history-row:hover { background: rgba(236,72,153,0.04); }
     html.light .kr-history-kadar { background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.28); color: #BE185D; }
     html.light .kr-empty { color: rgba(74,7,40,0.4); }
+
+    /* ══ THEME PICKER ══ */
+.theme-picker-overlay{
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(0,0,0,0.35);
+}
+.theme-picker-overlay.visible{display:block}
+.theme-picker-panel{
+  position:fixed; top:60px; right:16px; z-index:9999;
+  background:var(--surface); border:1px solid var(--border-mid);
+  border-radius:var(--r-xl); padding:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.4);
+  max-width:calc(100vw - 32px);
+  display:none;
+}
+.theme-picker-panel.visible{display:block; animation:tpIn .18s cubic-bezier(.34,1.4,.64,1) both}
+@keyframes tpIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+.theme-picker-title{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+.theme-picker-row{display:flex; gap:10px; overflow-x:auto; padding-bottom:14px; scrollbar-width:thin}
+.theme-card{
+  flex:0 0 auto; width:130px; cursor:pointer;
+  border:2px solid var(--border); border-radius:14px; padding:10px 8px;
+  background:var(--tc-bg); position:relative; transition:all .15s;
+}
+.theme-card:hover{transform:translateY(-2px); border-color:var(--border-strong)}
+.theme-card.active{border-color:var(--gold); box-shadow:0 0 0 2px rgba(244,114,182,.25)}
+.theme-card-name{font-size:.78rem; font-weight:700; text-align:center; margin-bottom:8px; color:var(--tc-text)}
+.theme-card-dots{display:flex; gap:5px; justify-content:center}
+.theme-card-dots span{width:16px;height:16px;border-radius:50%; border:1px solid rgba(0,0,0,0.08)}
+.theme-card-arrow{
+  position:absolute; left:50%; bottom:-13px; transform:translateX(-50%);
+  width:0;height:0; border-left:7px solid transparent; border-right:7px solid transparent;
+  border-top:8px solid var(--gold); display:none;
+}
+.theme-card.active .theme-card-arrow{display:block}
   </style>
 </head>
 <body>
@@ -1812,7 +1847,13 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="online-dot"></div>
     <span id="onlineCount">—</span>
   </div>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Ganti tema">🌙</button>
+<button class="theme-toggle" id="themeToggle" onclick="openThemePicker()" title="Ganti tema">🎨</button>
+
+<div class="theme-picker-overlay" id="themePickerOverlay" onclick="closeThemePicker()"></div>
+<div class="theme-picker-panel" id="themePickerPanel">
+  <div class="theme-picker-title">Pilih Tema</div>
+  <div class="theme-picker-row" id="themePickerRow"></div>
+</div>
 </nav>
 <div class="update-info" id="updateInfo">Update 31 July 2025 &nbsp;<span id="syncStatus"></span></div>
 
