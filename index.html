@@ -3786,11 +3786,92 @@ async function initOnlineTracking() {
 /* ══════════════════════════════════
    INIT
 ══════════════════════════════════ */
-/* ── theme toggle ── */
-function toggleTheme(){
-  const isLight=document.documentElement.classList.toggle('light');
-  document.getElementById('themeToggle').textContent=isLight?'☀️':'🌙';
-  try{localStorage.setItem('_theme',isLight?'light':'dark');}catch(e){}
+/* ══════════════════════════════════
+   THEME SWITCHER — multi tema
+══════════════════════════════════ */
+const THEMES = [
+  { id:'classic',    name:'Classic',        dark:false, bg:'#FDF2F8', surface:'#FFFFFF', surface2:'#FCE7F3', surface3:'#FBCFE8', text:'#4A0728', textSub:'rgba(74,7,40,.65)', textMuted:'rgba(74,7,40,.42)', border:'rgba(236,72,153,.18)', borderMid:'rgba(236,72,153,.32)', gold:'#EC4899', goldLight:'#BE185D', green:'#EC4899', red:'#DC2626',
+    dots:['#EC4899','#14B8A6','#D1D5DB','#4B5563','#111827'] },
+  { id:'dark',       name:'Dark',           dark:true,  bg:'#0D0710', surface:'#160D1A', surface2:'#1E1024', surface3:'#271530', text:'#FFFFFF', textSub:'rgba(255,255,255,.7)', textMuted:'rgba(255,255,255,.4)', border:'rgba(244,114,182,.15)', borderMid:'rgba(244,114,182,.32)', gold:'#F472B6', goldLight:'#FBCFE8', green:'#F472B6', red:'#F87171',
+    dots:['#F472B6','#14B8A6','#6B7280','#374151','#FFFFFF'] },
+  { id:'koopa',      name:"Koopa Beach",    dark:false, bg:'#FFF9F0', surface:'#FFFFFF', surface2:'#FFF1DE', surface3:'#FFE3BF', text:'#2A1D12', textSub:'rgba(42,29,18,.65)', textMuted:'rgba(42,29,18,.42)', border:'rgba(249,115,22,.2)', borderMid:'rgba(249,115,22,.35)', gold:'#F97316', goldLight:'#C2410C', green:'#34D399', red:'#DC2626',
+    dots:['#F97316','#A7F3D0','#FEF3E2','#1E293B','#FFFFFF'] },
+  { id:'choco',      name:'Choco Mountain', dark:true,  bg:'#2E1B12', surface:'#3D2418', surface2:'#4A2C1D', surface3:'#5B3A29', text:'#FDF3E7', textSub:'rgba(253,243,231,.72)', textMuted:'rgba(253,243,231,.45)', border:'rgba(232,168,124,.22)', borderMid:'rgba(232,168,124,.4)', gold:'#E8A87C', goldLight:'#F4C9A8', green:'#D1477A', red:'#EF6B5A',
+    dots:['#E8A87C','#D1477A','#7A4A32','#2E1B12','#FDF3E7'] },
+  { id:'sherbet',    name:'Sherbet Land',   dark:false, bg:'#F0FBFA', surface:'#FFFFFF', surface2:'#E0F5F1', surface3:'#C8ECE4', text:'#0F2A2E', textSub:'rgba(15,42,46,.65)', textMuted:'rgba(15,42,46,.42)', border:'rgba(52,211,153,.22)', borderMid:'rgba(52,211,153,.4)', gold:'#34D399', goldLight:'#059669', green:'#3B82F6', red:'#DC2626',
+    dots:['#34D399','#BFDBFE','#93C5FD','#1E3A5F','#FFFFFF'] },
+  { id:'toad',       name:"Toad's Turnpike",dark:true,  bg:'#12152A', surface:'#191D38', surface2:'#212648', surface3:'#2B3158', text:'#FFFFFF', textSub:'rgba(255,255,255,.7)', textMuted:'rgba(255,255,255,.42)', border:'rgba(232,163,61,.2)', borderMid:'rgba(232,163,61,.38)', gold:'#E8A33D', goldLight:'#F4C570', green:'#DC2626', red:'#DC2626',
+    dots:['#E8A33D','#DC2626','#6B7280','#12152A','#FFFFFF'] },
+  { id:'moomoo',     name:'Moo Moo Farm',   dark:false, bg:'#FDF6E9', surface:'#FFFFFF', surface2:'#FBEDD1', surface3:'#F7E0B0', text:'#2D2410', textSub:'rgba(45,36,16,.65)', textMuted:'rgba(45,36,16,.42)', border:'rgba(244,114,182,.2)', borderMid:'rgba(244,114,182,.38)', gold:'#F472B6', goldLight:'#DB2777', green:'#7DD3C0', red:'#DC2626',
+    dots:['#F472B6','#7DD3C0','#4A6FA5','#1F2D50','#FFFFFF'] },
+  { id:'bowser',     name:"Bowser's Castle",dark:true,  bg:'#0D0B14', surface:'#17131F', surface2:'#1F1A2C', surface3:'#2A2338', text:'#FFFFFF', textSub:'rgba(255,255,255,.7)', textMuted:'rgba(255,255,255,.42)', border:'rgba(124,58,237,.25)', borderMid:'rgba(124,58,237,.42)', gold:'#7C3AED', goldLight:'#A78BFA', green:'#4338CA', red:'#F87171',
+    dots:['#7C3AED','#4338CA','#64748B','#0D0B14','#FFFFFF'] },
+  { id:'yoshi',      name:'Yoshi Valley',   dark:false, bg:'#FAF7F0', surface:'#FFFFFF', surface2:'#F1ECDD', surface3:'#E6DCC0', text:'#26301A', textSub:'rgba(38,48,26,.65)', textMuted:'rgba(38,48,26,.42)', border:'rgba(101,163,13,.22)', borderMid:'rgba(101,163,13,.4)', gold:'#65A30D', goldLight:'#4D7C0F', green:'#65A30D', red:'#DC5B32',
+    dots:['#65A30D','#DC5B32','#C9BFAF','#4B5563','#FFFFFF'] },
+  { id:'rainbow',    name:'Rainbow Road',   dark:true,  bg:'#0A0A0F', surface:'#15141F', surface2:'#1E1C2C', surface3:'#282538', text:'#FDE047', textSub:'rgba(255,255,255,.75)', textMuted:'rgba(255,255,255,.45)', border:'rgba(34,242,122,.22)', borderMid:'rgba(168,85,247,.4)', gold:'#22F27A', goldLight:'#86FFC0', green:'#A855F7', red:'#F43F5E',
+    dots:['#22F27A','#A855F7','#F43F5E','#FDE047','#FFFFFF'] },
+];
+
+function hexToRgb(hex){
+  const m=hex.replace('#','');
+  const n=parseInt(m,16);
+  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+}
+
+function applyTheme(id, save=true){
+  const t = THEMES.find(x=>x.id===id) || THEMES[1];
+  const root = document.documentElement.style;
+  root.setProperty('--bg', t.bg);
+  root.setProperty('--surface', t.surface);
+  root.setProperty('--surface-2', t.surface2);
+  root.setProperty('--surface-3', t.surface3);
+  root.setProperty('--text', t.text);
+  root.setProperty('--text-sub', t.textSub);
+  root.setProperty('--text-muted', t.textMuted);
+  root.setProperty('--text-dim', t.dark?'rgba(255,255,255,.18)':'rgba(0,0,0,.2)');
+  root.setProperty('--border', t.border);
+  root.setProperty('--border-mid', t.borderMid);
+  root.setProperty('--border-strong', t.borderMid.replace(/[\d.]+\)$/,'.6)'));
+  root.setProperty('--gold', t.gold);
+  root.setProperty('--gold-light', t.goldLight);
+  root.setProperty('--gold-pale', t.goldLight);
+  root.setProperty('--gold-dim', t.goldLight);
+  root.setProperty('--green', t.green);
+  root.setProperty('--green-glow', `rgba(${hexToRgb(t.green)},.25)`);
+  root.setProperty('--red', t.red);
+  root.setProperty('--red-faint', `rgba(${hexToRgb(t.red)},.1)`);
+  root.setProperty('--navbar-bg', t.dark?`rgba(${hexToRgb(t.bg)},.94)`:`rgba(${hexToRgb(t.bg)},.92)`);
+  root.setProperty('--price-color', t.dark?'#FFFFFF':t.text);
+  root.setProperty('--price-market-color', t.textSub);
+  root.setProperty('--ambient-1', `rgba(${hexToRgb(t.gold)},.10)`);
+  root.setProperty('--ambient-2', `rgba(${hexToRgb(t.green)},.07)`);
+
+  document.documentElement.classList.toggle('light', !t.dark);
+  document.documentElement.setAttribute('data-theme', t.id);
+  if(save){ try{localStorage.setItem('_theme_id', t.id);}catch(e){} }
+  renderThemePicker(t.id);
+}
+
+function renderThemePicker(activeId){
+  const row = document.getElementById('themePickerRow');
+  if(!row) return;
+  row.innerHTML = THEMES.map(t=>`
+    <div class="theme-card ${t.id===activeId?'active':''}" style="--tc-bg:${t.bg};--tc-text:${t.text}" onclick="applyTheme('${t.id}')">
+      <div class="theme-card-name">${t.name}</div>
+      <div class="theme-card-dots">${t.dots.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+      <div class="theme-card-arrow"></div>
+    </div>`).join('');
+}
+
+function openThemePicker(){
+  document.getElementById('themePickerOverlay').classList.add('visible');
+  document.getElementById('themePickerPanel').classList.add('visible');
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  renderThemePicker(cur);
+}
+function closeThemePicker(){
+  document.getElementById('themePickerOverlay').classList.remove('visible');
+  document.getElementById('themePickerPanel').classList.remove('visible');
 }
 /* ══════════════════════════════════
    REALTIME SYNC — harga & charge (auto update ke semua user)
@@ -3836,7 +3917,12 @@ document.addEventListener('visibilitychange', async () => {
   
 window.onload=async function(){
   // restore saved theme
-  try{if(localStorage.getItem('_theme')==='light'){document.documentElement.classList.add('light');document.getElementById('themeToggle').textContent='☀️';}}catch(e){}
+  // restore saved theme
+  try{
+    const savedTheme = localStorage.getItem('_theme_id') || (localStorage.getItem('_theme')==='light' ? 'classic' : 'dark');
+    applyTheme(savedTheme, false);
+  }catch(e){ applyTheme('dark', false); }
+  
   setSyncStatus('saving');
   await loadCharge();
   await loadHarga();
